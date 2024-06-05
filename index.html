@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="imgs"><img src="#"></div>
+  <button class="new-img-btn">Get New Image</button>
+  <script>
+    const img = document.querySelector("img");
+    fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob", { mode: "cors" }).then(response => {
+      return response.json();
+    }).then(data => {
+      console.log(data);
+      img.setAttribute("src", data.data.images.original.url);
+    }).catch(err => {
+      console.log(err);
+    })
+
+    const imgsDiv = document.querySelector(".imgs");
+    const newImgBtn = document.querySelector(".new-img-btn");
+    newImgBtn.addEventListener("click", () => {
+      const imgTag = document.createElement("img");
+      fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob+and+patrick", { mode: "cors" }).then(res => {
+        return res.json();
+      }).then(data => {
+        imgTag.setAttribute("src", data.data.images.original.url);
+        imgsDiv.appendChild(imgTag);
+      }).catch(err => {
+        console.log(err);
+      })
+    })
+
+
+  </script>
+</body>
+
+</html>
