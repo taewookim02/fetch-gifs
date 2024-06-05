@@ -21,12 +21,16 @@
   <script>
     // initial gif
     const img = document.querySelector("img");
-    fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob", { mode: "cors" }).then(response => {
-      return response.json();
+    fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob", { mode: "cors" }).then(res => {
+      if (!res.ok && res.status === 429) {
+        throw new Error("Too many Requests");
+      }
+
+      return res.json();
     }).then(data => {
       img.setAttribute("src", data.data.images.original.url);
     }).catch(err => {
-      console.log(err);
+      img.setAttribute("alt", err);
     })
 
     // new img 
@@ -35,12 +39,17 @@
     newImgBtn.addEventListener("click", () => {
       const imgTag = document.createElement("img");
       fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob+and+patrick", { mode: "cors" }).then(res => {
+        if (!res.ok && res.status === 429) {
+          console.log(res);
+          throw new Error("Too many Requests");
+        }
+
         return res.json();
       }).then(data => {
         imgTag.setAttribute("src", data.data.images.original.url);
         imgsDiv.appendChild(imgTag);
       }).catch(err => {
-        console.log(err);
+        imgsDiv.innerHTML = imgsDiv.innerHTML += ` ${err}`;
       })
     })
 
@@ -51,6 +60,9 @@
       if (e.key === "Enter") {
         const searchQuery = searchInput.value;
         fetch(`https://api.giphy.com/v1/gifs/search?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&q=${searchQuery}&limit=5`).then(res => {
+          if (!res.ok && res.status === 429) {
+            throw new Error("Too many Requests");
+          }
           return res.json();
         }).then(data => {
           searchImgsDiv.innerHTML = ""; // clear
@@ -60,7 +72,7 @@
             searchImgsDiv.appendChild(imgTag);
           })
         }).catch(err => {
-          console.log(err);
+          searchImgsDiv.innerHTML += ` ${err}`;
         })
       }
     })
