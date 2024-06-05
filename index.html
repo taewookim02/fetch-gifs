@@ -4,22 +4,32 @@
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
+  <style>
+    .search-imgs,
+    .imgs {
+      display: flex;
+      gap: 16px;
+    }
+  </style>
 </head>
 
 <body>
   <div class="imgs"><img src="#"></div>
   <button class="new-img-btn">Get New Image</button>
+  <div class="search-div"><input type="text" class="search" placeholder="search & enter"></div>
+  <div class="search-imgs"></div>
   <script>
+    // initial gif
     const img = document.querySelector("img");
     fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob", { mode: "cors" }).then(response => {
       return response.json();
     }).then(data => {
-      console.log(data);
       img.setAttribute("src", data.data.images.original.url);
     }).catch(err => {
       console.log(err);
     })
 
+    // new img 
     const imgsDiv = document.querySelector(".imgs");
     const newImgBtn = document.querySelector(".new-img-btn");
     newImgBtn.addEventListener("click", () => {
@@ -34,6 +44,26 @@
       })
     })
 
+    // search
+    const searchInput = document.querySelector(".search");
+    const searchImgsDiv = document.querySelector(".search-imgs");
+    searchInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const searchQuery = searchInput.value;
+        fetch(`https://api.giphy.com/v1/gifs/search?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&q=${searchQuery}&limit=5`).then(res => {
+          return res.json();
+        }).then(data => {
+          searchImgsDiv.innerHTML = ""; // clear
+          data.data.forEach(imgInfo => {
+            const imgTag = document.createElement("img");
+            imgTag.setAttribute("src", imgInfo.images.fixed_height.url);
+            searchImgsDiv.appendChild(imgTag);
+          })
+        }).catch(err => {
+          console.log(err);
+        })
+      }
+    })
 
   </script>
 </body>
