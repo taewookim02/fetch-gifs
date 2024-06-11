@@ -22,66 +22,70 @@
   <script>
     // initial gif
     const img = document.querySelector("img");
-    fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob", { mode: "cors" }).then(res => {
-      if (!res.ok && res.status === 429) {
-        throw new Error("Too many Requests");
+    async function getSpongebob() {
+      try {
+        const response = await fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob", { mode: "cors" });
+        if (!response.ok && response.status === 429) {
+          console.log(res);
+          throw new Error("Too many Requests");
+        }
+        const spongebobData = await response.json();
+        img.setAttribute("src", spongebobData.data.images.original.url);
+      } catch (error) {
+        img.setAttribute("alt", error);
       }
+    };
+    getSpongebob();
 
-      return res.json();
-    }).then(data => {
-      img.setAttribute("src", data.data.images.original.url);
-    }).catch(err => {
-      img.setAttribute("alt", err);
-    })
 
     // new img 
     const imgsDiv = document.querySelector(".imgs");
     const newImgBtn = document.querySelector(".new-img-btn");
-    newImgBtn.addEventListener("click", () => {
+    async function getNewImage() {
       const imgTag = document.createElement("img");
-      fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob+and+patrick", { mode: "cors" }).then(res => {
-        if (!res.ok && res.status === 429) {
+      try {
+        const response = await fetch("https://api.giphy.com/v1/gifs/translate?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&s=spongebob+and+patrick", { mode: "cors" });
+        if (!response.ok && response.status === 429) {
           console.log(res);
           throw new Error("Too many Requests");
         }
-
-        return res.json();
-      }).then(data => {
+        const data = await response.json();
         imgTag.setAttribute("src", data.data.images.original.url);
         imgsDiv.appendChild(imgTag);
-      }).catch(err => {
-        imgsDiv.innerHTML = imgsDiv.innerHTML += ` ${err}`;
-      })
-    })
+
+      } catch (error) {
+        imgsDiv.innerHTML = imgsDiv.innerHTML += ` ${error}`;
+      }
+    }
+    newImgBtn.addEventListener("click", getNewImage);
 
     // search
     const searchInput = document.querySelector(".search");
     const searchImgsDiv = document.querySelector(".search-imgs");
-    searchInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        const searchQuery = searchInput.value;
-        fetch(`https://api.giphy.com/v1/gifs/search?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&q=${searchQuery}&limit=5`).then(res => {
-          if (!res.ok && res.status === 429) {
+    async function getSearch(e) {
+      try {
+        if (e.key === "Enter") {
+          const searchQuery = searchInput.value;
+          const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=b7IJnPd3SOdKN7x3DTQfhY5wndQqC159&q=${searchQuery}&limit=5`);
+          if (!response.ok && response.status === 429) {
             throw new Error("Too many Requests");
           }
-          return res.json();
-        }).then(data => {
+          const data = await response.json();
           searchImgsDiv.innerHTML = ""; // clear
-
           if (data.data.length === 0) {
             searchImgsDiv.innerHTML = "No search data...";
           }
-
           data.data.forEach(imgInfo => {
             const imgTag = document.createElement("img");
             imgTag.setAttribute("src", imgInfo.images.fixed_height.url);
             searchImgsDiv.appendChild(imgTag);
           })
-        }).catch(err => {
-          searchImgsDiv.innerHTML += ` ${err}`;
-        })
+        }
+      } catch (error) {
+        searchImgsDiv.innerHTML += ` ${error}`;
       }
-    })
+    }
+    searchInput.addEventListener("keydown", getSearch);
 
   </script>
 </body>
